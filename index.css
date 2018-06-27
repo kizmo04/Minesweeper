@@ -1,0 +1,28 @@
+.map-row {
+}
+
+.map-cell {
+  text-align: center;
+  width: 20px;
+  height: 10px;
+  cursor: pointer;
+}
+
+.blind {
+  position: relative;
+}
+
+.blind::after {
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  content: " ";
+  background-color: black;
+}
+
+.hide {
+  display: none;
+}
