@@ -1,7 +1,7 @@
 
 (function() {
-  var size = 5;
-  var quantity = 1;
+  var size = 100;
+  var quantity = 30;
 
   function createMap() {
     var mapRow = new Array(size);

@@ -1,7 +1,7 @@
 {
-  "name": "vanilla-calendar",
+  "name": "minesweeper",
   "version": "1.0.0",
-  "description": "Vanilla Calendar",
+  "description": "Minesweeper",
   "main": "webpack.config.js",
   "devDependencies": {
     "css-loader": "^0.28.4",
@@ -21,12 +21,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vanilla-coding/vanilla-calendar.git"
+    "url": "git+https://github.com/kizmo04/Minesweeper.git"
   },
-  "author": "Ken Huh <ken@vanillacoding.co>",
-  "license": "ISC",
+  "author": "Joonmo Kim <get.kizmo@gmail.com>",
+  "license": "",
   "bugs": {
-    "url": "https://github.com/vanilla-coding/vanilla-calendar/issues"
+    "url": "https://github.com/kizmo04/Minesweeper/issues"
   },
-  "homepage": "https://github.com/vanilla-coding/vanilla-calendar#readme"
+  "homepage": "https://github.com/kizmo04/Minesweeper#readme"
 }
