@@ -3,18 +3,30 @@
 <head>
   <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css">
   <title>JS Bin</title>
 </head>
 <body>
-  <h1>지뢰찾기</h1>
-  <div class="btn-container">
-    <a class="btn-new" href="">새 게임</a>
-    <a class="btn-load" href="">불러오기</a>
-    <a class="btn-score" href="">점수 보기</a>
-    <a class="btn-retry hide" href="">다시하기</a>
+  <div class="minesweeper-container">
+    <h1 id="title">지뢰찾기</h1>
+    <div class="btn-container">
+      <a class="btn-new" href="">새 게임</a>
+      <a class="btn-load" href="">불러오기</a>
+      <a class="btn-score" href="">점수 보기</a>
+      <!-- <a class="btn-retry hide" href="">다시하기</a> -->
+    </div>
+    <div class="game-container">
+      <div class="game-box">
+        <div class="score-container">
+          <div class="display-time"></div>
+          <div class="display-state"></div>
+          <div class="display-score"></div>
+        </div>
+        <table id="minesweeper"></table>
+      </div>
+    </div>
   </div>
-  <table id="minesweeper"></table>
 <script type="text/javascript" src="bundle.js"></script></body>
 <script type="text/javascript" src="index.js"></script>
 </html>

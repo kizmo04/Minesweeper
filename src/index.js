@@ -1,7 +1,22 @@
 
 (function() {
-  var size = 100;
+  var size = 20;
   var quantity = 30;
+
+  var sourceImgUrl = {
+    0: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/0.png?raw=true')",
+    1: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/1.png?raw=true')",
+    2: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/2.png?raw=true')",
+    3: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/3.png?raw=true')",
+    4: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/4.png?raw=true')",
+    5: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/5.png?raw=true')",
+    6: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/6.png?raw=true')",
+    7: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/7.png?raw=true')",
+    8: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/8.png?raw=true')",
+    '*': "url('https://github.com/pardahlman/minesweeper/blob/master/Images/bomb.png?raw=true')"
+  }
+
+  var deadImgUrl = "https://png2.kisspng.com/sh/d19633b4fd54c97092e8472864540d1d/L0KzQYm3UsA1N6lBfZH0aYP2gLBuTfVud5tuReV2aXzoiX76lPlkc5Z3Rd9uYX7sfri0hvVmdJpzf598YXSwdb72ivkueJ9sRdh7ZXWwdLFAjvxwaZUyTdMCN3HndIO9hfMyO2QzSaMDM0a1QIq4VcE4P2o3T6Q7NEW2R3B3jvc=/kisspng-emoji-smiley-sticker-meaning-feeling-sad-emoji-png-free-download-5a77add26ec133.1183620915177927224537.png";
 
   function createMap() {
     var mapRow = new Array(size);
@@ -70,8 +85,9 @@
         mapCell.classList.add('map-cell');
         mapCell.classList.add('blind');
         mapCell.dataset.value = mineMap[i][j];
+        mapCell.style.backgroundImage = sourceImgUrl[mineMap[i][j]];
         mapCell.dataset.index = i * 10 + j;
-        mapCell.textContent = mineMap[i][j];
+        
         mapRow.appendChild(mapCell);
       }
     }
@@ -95,14 +111,16 @@
         blindCellList.forEach(function(item) {
           item.classList.remove('blind');
         });
+        var smileIcon = document.querySelector('.display-state');
+        smileIcon.style.backgroundImage = "url('" + deadImgUrl + "')"
         alert('you died!');
-        document.querySelector('a.hide').classList.remove('hide');
+        // document.querySelector('a.hide').classList.remove('hide');
       } else {
         e.target.classList.remove('blind');
         nonBombCellList.pop();
         if (nonBombCellList.length < 1) {
           alert('끝!');
-          document.querySelector('a.hide').classList.remove('hide');
+          // document.querySelector('a.hide').classList.remove('hide');
         }
       }
     }

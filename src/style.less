@@ -1,26 +1,131 @@
+
+@borderWidth: 4px;
+@fontFamily: 'NanumSquare', sans-serif;
+@tableSize : 100%;
+@cellSize : 30px;
+
+.minesweeper-container {
+  width: 50%;
+  margin: 0 auto;
+  padding: 100px 0;
+
+  #title {
+    font-size: 3em;
+    font-family: @fontFamily;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .btn-container {
+    width: 90%;
+    height: 70px;
+    margin: 0 auto;
+    text-align: center;
+
+    a[class|='btn'] {
+      font-family: @fontFamily;
+      font-size: 1.5em;
+      text-align: center;
+      padding: 10px;
+      text-decoration: none;
+      color: black;
+    }
+  }
+
+  .game-container {
+    margin: 0 auto;
+    // width: inherit;
+    .game-box {
+      // width: inherit;
+      padding: 20px;
+      background-color: #CCCCCC;
+      border-left: @borderWidth solid white;
+      border-top: @borderWidth solid white;
+      border-bottom: @borderWidth solid #808080;
+      border-right: @borderWidth solid #808080;
+
+      .score-container {
+        margin-bottom: 20px;
+        // padding: 10px;
+        background-color: #CCCCCC;
+        border-right: @borderWidth solid white;
+        border-bottom: @borderWidth solid white;
+        border-top: @borderWidth solid #808080;
+        border-left: @borderWidth solid #808080;
+
+        .display-time {
+
+        }
+        .display-state {
+          background-color: #CCCCCC;
+          background-image: url(https://png2.kisspng.com/sh/98219748cf673dee7aa975805180eb0e/L0KzQYi4UsE5N5YAUZGAYUO6RoS3gcdlamE3TZCAOEe8R4W3VME2OWQ6T6s7N0S4QYWBTwBvbz==/5a37630a7db025.5879740415135792745148.png);
+          background-repeat: no-repeat;
+          background-position: center;
+          border-left: @borderWidth solid white;
+          border-top: @borderWidth solid white;
+          border-bottom: @borderWidth solid #808080;
+          border-right: @borderWidth solid #808080;
+          border-radius: 2px;
+          width: 60px;
+          height: 60px;
+          background-size: 50px 50px;
+          margin: 10px auto;
+        }
+        .display-score {
+
+        }
+      }
+
+      table#minesweeper {
+        // width: @tableSize;
+        margin: 0 auto;
+        width: inherit;
+        border-bottom: @borderWidth solid white;
+        border-right: @borderWidth solid white;
+        border-top: @borderWidth solid #808080;
+        border-left: @borderWidth solid #808080;
+      }
+    }
+
+  }
+
+}
+
+
+
+
 .map-row {
 }
 
 .map-cell {
   text-align: center;
-  width: 20px;
-  height: 10px;
+  width: @cellSize;
+  height: @cellSize;
   cursor: pointer;
+  background-size: @cellSize @cellSize;
+  background-position: center;
+  // border : 1px solid #868686;
+  background-color: #C1C1C1;
+  background-repeat: no-repeat;
 }
 
 .blind {
   position: relative;
 }
 
-.blind::after {
+td.blind::after {
   top: 0;
   left: 0;
   position: absolute;
-  display: block;
-  width: 100%;
-  height: 100%;
+  // display: block;
+  width: @cellSize - @borderWidth * 2;
+  height: @cellSize - @borderWidth * 2;
   content: " ";
-  background-color: black;
+  background-color: #CCCCCC;
+  border-left: @borderWidth solid white;
+  border-top: @borderWidth solid white;
+  border-bottom: @borderWidth solid #808080;
+  border-right: @borderWidth solid #808080;
 }
 
 .hide {

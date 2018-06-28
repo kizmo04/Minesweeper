@@ -60,193 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(1);
-module.exports = __webpack_require__(2);
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-
-(function() {
-  var size = 100;
-  var quantity = 30;
-
-  function createMap() {
-    var mapRow = new Array(size);
-    for (var i = 0; i < size; i++) {
-      mapRow[i] = new Array(size);
-      for (var j = 0; j < size; j++) {
-        mapRow[i][j] = 0;
-      }
-    }
-    return mapRow;
-  }
-
-  function Bomb(locationX, locationY) {
-    this.locationX = locationX;
-    this.locationY = locationY;
-  }
-
-  function getRandom(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-
-  function makeBomb() {
-    var bombList = [];
-    var prevBombLocation = [];
-
-    while (bombList.length < quantity) {
-      var x = getRandom(0, size);
-      var y = getRandom(0, size);
-      var tempLocation = x + '-' + y;
-      if (!prevBombLocation.includes(tempLocation)) {
-        bombList.push(new Bomb(x, y));
-        prevBombLocation.push(tempLocation);
-      }
-    }
-    return bombList;
-  }
-
-  function searchBomb(map, bombList) {
-    for (var i = 0; i < bombList.length; i++) {
-      for (var j = bombList[i].locationX - 1; j <= bombList[i].locationX + 1; j++) {
-        for (var k = bombList[i].locationY - 1; k <= bombList[i].locationY + 1; k++) {
-          if (0 <= j && j <= size - 1 && 0 <= k && k <= size - 1) {
-            if (j === bombList[i].locationX && k === bombList[i].locationY) {
-              map[j][k] = '*';
-            } else if (map[j][k] !== '*') {
-              map[j][k] += 1;
-            }
-          }
-        }
-      }
-    }
-    return map;
-  }
-
-  var mineMapTable = document.querySelector('#minesweeper');
-
-  function loadTemplate() {
-    for (var i = 0; i < size; i++) {
-      var mapRow = document.createElement('tr');
-      mapRow.classList.add('map-row');
-      mineMapTable.appendChild(mapRow);
-      for (var j = 0; j < size; j++) {
-        var mapCell = document.createElement('td');
-        mapCell.classList.add('map-cell');
-        mapCell.classList.add('blind');
-        mapCell.dataset.value = mineMap[i][j];
-        mapCell.dataset.index = i * 10 + j;
-        mapCell.textContent = mineMap[i][j];
-        mapRow.appendChild(mapCell);
-      }
-    }
-  }
-
-  var bombList = makeBomb();
-  var map = createMap();
-  var mineMap = searchBomb(map, bombList);
-  loadTemplate();
-  var blindCellList = document.querySelectorAll('.blind');
-  var nonBombCellList = [];
-  blindCellList.forEach(function(item) {
-    if (item.dataset.value !== '*') {
-      nonBombCellList.push(item);
-    }
-  });
-
-  mineMapTable.addEventListener('click', function(e) {
-    if (e.target && Array.prototype.includes.call(e.target.classList, 'blind')) {
-      if (e.target.dataset.value === '*') {
-        blindCellList.forEach(function(item) {
-          item.classList.remove('blind');
-        });
-        alert('you died!');
-        document.querySelector('a.hide').classList.remove('hide');
-      } else {
-        e.target.classList.remove('blind');
-        nonBombCellList.pop();
-        if (nonBombCellList.length < 1) {
-          alert('끝!');
-          document.querySelector('a.hide').classList.remove('hide');
-        }
-      }
-    }
-  });
-})();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(3);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// Prepare cssTransformation
-var transform;
-
-var options = {}
-options.transform = transform
-// add the styles to the DOM
-var update = __webpack_require__(5)(content, options);
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!./style.less", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!./style.less");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(false);
-// imports
-
-
-// module
-exports.push([module.i, ".map-cell {\n  text-align: center;\n  width: 20px;\n  height: 10px;\n  cursor: pointer;\n}\n.blind {\n  position: relative;\n}\n.blind::after {\n  top: 0;\n  left: 0;\n  position: absolute;\n  display: block;\n  width: 100%;\n  height: 100%;\n  content: \" \";\n  background-color: black;\n}\n.hide {\n  display: none;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -328,7 +146,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 5 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -687,6 +505,207 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(3);
+__webpack_require__(4);
+module.exports = __webpack_require__(7);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+
+(function() {
+  var size = 20;
+  var quantity = 30;
+
+  var sourceImgUrl = {
+    0: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/0.png?raw=true')",
+    1: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/1.png?raw=true')",
+    2: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/2.png?raw=true')",
+    3: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/3.png?raw=true')",
+    4: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/4.png?raw=true')",
+    5: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/5.png?raw=true')",
+    6: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/6.png?raw=true')",
+    7: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/7.png?raw=true')",
+    8: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/8.png?raw=true')",
+    '*': "url('https://github.com/pardahlman/minesweeper/blob/master/Images/bomb.png?raw=true')"
+  }
+
+  var deadImgUrl = "https://png2.kisspng.com/sh/d19633b4fd54c97092e8472864540d1d/L0KzQYm3UsA1N6lBfZH0aYP2gLBuTfVud5tuReV2aXzoiX76lPlkc5Z3Rd9uYX7sfri0hvVmdJpzf598YXSwdb72ivkueJ9sRdh7ZXWwdLFAjvxwaZUyTdMCN3HndIO9hfMyO2QzSaMDM0a1QIq4VcE4P2o3T6Q7NEW2R3B3jvc=/kisspng-emoji-smiley-sticker-meaning-feeling-sad-emoji-png-free-download-5a77add26ec133.1183620915177927224537.png";
+
+  function createMap() {
+    var mapRow = new Array(size);
+    for (var i = 0; i < size; i++) {
+      mapRow[i] = new Array(size);
+      for (var j = 0; j < size; j++) {
+        mapRow[i][j] = 0;
+      }
+    }
+    return mapRow;
+  }
+
+  function Bomb(locationX, locationY) {
+    this.locationX = locationX;
+    this.locationY = locationY;
+  }
+
+  function getRandom(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  function makeBomb() {
+    var bombList = [];
+    var prevBombLocation = [];
+
+    while (bombList.length < quantity) {
+      var x = getRandom(0, size);
+      var y = getRandom(0, size);
+      var tempLocation = x + '-' + y;
+      if (!prevBombLocation.includes(tempLocation)) {
+        bombList.push(new Bomb(x, y));
+        prevBombLocation.push(tempLocation);
+      }
+    }
+    return bombList;
+  }
+
+  function searchBomb(map, bombList) {
+    for (var i = 0; i < bombList.length; i++) {
+      for (var j = bombList[i].locationX - 1; j <= bombList[i].locationX + 1; j++) {
+        for (var k = bombList[i].locationY - 1; k <= bombList[i].locationY + 1; k++) {
+          if (0 <= j && j <= size - 1 && 0 <= k && k <= size - 1) {
+            if (j === bombList[i].locationX && k === bombList[i].locationY) {
+              map[j][k] = '*';
+            } else if (map[j][k] !== '*') {
+              map[j][k] += 1;
+            }
+          }
+        }
+      }
+    }
+    return map;
+  }
+
+  var mineMapTable = document.querySelector('#minesweeper');
+
+  function loadTemplate() {
+    for (var i = 0; i < size; i++) {
+      var mapRow = document.createElement('tr');
+      mapRow.classList.add('map-row');
+      mineMapTable.appendChild(mapRow);
+      for (var j = 0; j < size; j++) {
+        var mapCell = document.createElement('td');
+        mapCell.classList.add('map-cell');
+        mapCell.classList.add('blind');
+        mapCell.dataset.value = mineMap[i][j];
+        mapCell.style.backgroundImage = sourceImgUrl[mineMap[i][j]];
+        mapCell.dataset.index = i * 10 + j;
+        
+        mapRow.appendChild(mapCell);
+      }
+    }
+  }
+
+  var bombList = makeBomb();
+  var map = createMap();
+  var mineMap = searchBomb(map, bombList);
+  loadTemplate();
+  var blindCellList = document.querySelectorAll('.blind');
+  var nonBombCellList = [];
+  blindCellList.forEach(function(item) {
+    if (item.dataset.value !== '*') {
+      nonBombCellList.push(item);
+    }
+  });
+
+  mineMapTable.addEventListener('click', function(e) {
+    if (e.target && Array.prototype.includes.call(e.target.classList, 'blind')) {
+      if (e.target.dataset.value === '*') {
+        blindCellList.forEach(function(item) {
+          item.classList.remove('blind');
+        });
+        var smileIcon = document.querySelector('.display-state');
+        smileIcon.style.backgroundImage = "url('" + deadImgUrl + "')"
+        alert('you died!');
+        // document.querySelector('a.hide').classList.remove('hide');
+      } else {
+        e.target.classList.remove('blind');
+        nonBombCellList.pop();
+        if (nonBombCellList.length < 1) {
+          alert('끝!');
+          // document.querySelector('a.hide').classList.remove('hide');
+        }
+      }
+    }
+  });
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(5);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!./reset.less", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!./reset.less");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(false);
+// imports
+
+
+// module
+exports.push([module.i, "/* reset--------------------------------- */\n/* http://meyerweb.com/eric/tools/css/reset/\n   v2.0 | 20110126\n   License: none (public domain)\n*/\nhtml,\nbody,\ndiv,\nspan,\napplet,\nobject,\niframe,\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\np,\nblockquote,\npre,\na,\nabbr,\nacronym,\naddress,\nbig,\ncite,\ncode,\ndel,\ndfn,\nem,\nimg,\nins,\nkbd,\nq,\ns,\nsamp,\nsmall,\nstrike,\nstrong,\nsub,\nsup,\ntt,\nvar,\nb,\nu,\ni,\ncenter,\ndl,\ndt,\ndd,\nol,\nul,\nli,\nfieldset,\nform,\nlabel,\nlegend,\ntable,\ncaption,\ntbody,\ntfoot,\nthead,\ntr,\nth,\ntd,\narticle,\naside,\ncanvas,\ndetails,\nembed,\nfigure,\nfigcaption,\nfooter,\nheader,\nhgroup,\nmenu,\nnav,\noutput,\nruby,\nsection,\nsummary,\ntime,\nmark,\naudio,\nvideo {\n  margin: 0;\n  padding: 0;\n  border: 0;\n  font-size: 100%;\n  font: inherit;\n  vertical-align: baseline;\n}\n/* HTML5 display-role reset for older browsers */\narticle,\naside,\ndetails,\nfigcaption,\nfigure,\nfooter,\nheader,\nhgroup,\nmenu,\nnav,\nsection {\n  display: block;\n}\nbody {\n  line-height: 1;\n}\nol,\nul {\n  list-style: none;\n}\nblockquote,\nq {\n  quotes: none;\n}\nblockquote:before,\nblockquote:after,\nq:before,\nq:after {\n  content: '';\n  content: none;\n}\ntable {\n  border-collapse: collapse;\n  border-spacing: 0;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports) {
 
@@ -779,6 +798,51 @@ module.exports = function (css) {
 	// send back the fixed css
 	return fixedCss;
 };
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(8);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(1)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!./style.less", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/less-loader/dist/cjs.js!./style.less");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(0)(false);
+// imports
+
+
+// module
+exports.push([module.i, ".minesweeper-container {\n  width: 50%;\n  margin: 0 auto;\n  padding: 100px 0;\n}\n.minesweeper-container #title {\n  font-size: 3em;\n  font-family: 'NanumSquare', sans-serif;\n  text-align: center;\n  padding: 20px;\n}\n.minesweeper-container .btn-container {\n  width: 90%;\n  height: 70px;\n  margin: 0 auto;\n  text-align: center;\n}\n.minesweeper-container .btn-container a[class|='btn'] {\n  font-family: 'NanumSquare', sans-serif;\n  font-size: 1.5em;\n  text-align: center;\n  padding: 10px;\n  text-decoration: none;\n  color: black;\n}\n.minesweeper-container .game-container {\n  margin: 0 auto;\n}\n.minesweeper-container .game-container .game-box {\n  padding: 20px;\n  background-color: #CCCCCC;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box .score-container {\n  margin-bottom: 20px;\n  background-color: #CCCCCC;\n  border-right: 4px solid white;\n  border-bottom: 4px solid white;\n  border-top: 4px solid #808080;\n  border-left: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box .score-container .display-state {\n  background-color: #CCCCCC;\n  background-image: url(https://png2.kisspng.com/sh/98219748cf673dee7aa975805180eb0e/L0KzQYi4UsE5N5YAUZGAYUO6RoS3gcdlamE3TZCAOEe8R4W3VME2OWQ6T6s7N0S4QYWBTwBvbz==/5a37630a7db025.5879740415135792745148.png);\n  background-repeat: no-repeat;\n  background-position: center;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n  border-radius: 2px;\n  width: 60px;\n  height: 60px;\n  background-size: 50px 50px;\n  margin: 10px auto;\n}\n.minesweeper-container .game-container .game-box table#minesweeper {\n  margin: 0 auto;\n  width: inherit;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  border-top: 4px solid #808080;\n  border-left: 4px solid #808080;\n}\n.map-cell {\n  text-align: center;\n  width: 30px;\n  height: 30px;\n  cursor: pointer;\n  background-size: 30px 30px;\n  background-position: center;\n  background-color: #C1C1C1;\n  background-repeat: no-repeat;\n}\n.blind {\n  position: relative;\n}\ntd.blind::after {\n  top: 0;\n  left: 0;\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  content: \" \";\n  background-color: #CCCCCC;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n}\n.hide {\n  display: none;\n}\n", ""]);
+
+// exports
 
 
 /***/ })
