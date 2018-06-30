@@ -11,17 +11,35 @@
   <div class="minesweeper-container">
     <h1 id="title">지뢰찾기</h1>
     <div class="btn-container">
-      <a class="btn-new" href="">새 게임</a>
-      <a class="btn-load" href="">불러오기</a>
-      <a class="btn-score" href="">점수 보기</a>
-      <!-- <a class="btn-retry hide" href="">다시하기</a> -->
+      <div class="main-menu-container">
+        <a class="btn-difficulty" href="">난이도</a>
+        <!-- <a class="btn-load" href="">불러오기</a> -->
+        <a class="btn-score" href="">점수 보기</a>
+        <!-- <a class="btn-retry hide" href="">다시하기</a> -->
+      </div>
+      <div class="difficulty-menu-container hide">
+        <a class="btn-beginner" href="">초보자</a>
+        <a class="btn-
+        amateur" href="">아마추어</a>
+        <a class="btn-expert" href="">전문가</a>
+        <a href="" class="btn-close">돌아가기</a>
+        <!-- <a class="btn-custom" href="">특별</a> -->
+      </div>
     </div>
     <div class="game-container">
       <div class="game-box">
         <div class="score-container">
-          <div class="display-time"></div>
-          <div class="display-state"></div>
-          <div class="display-score"></div>
+          <div class="display-count-bomb-left digits-box">
+            <span class="section-1 digits"> </span>
+            <span class="section-2 digits"> </span>
+            <span class="section-3 digits"> </span>
+          </div>
+          <div class="display-status"></div>
+          <div class="display-timer digits-box">
+            <span class="section-1 digits"> </span>
+            <span class="section-2 digits"> </span>
+            <span class="section-3 digits"> </span>
+          </div>
         </div>
         <table id="minesweeper"></table>
       </div>

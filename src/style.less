@@ -1,7 +1,7 @@
 
 @borderWidth: 4px;
 @fontFamily: 'NanumSquare', sans-serif;
-@tableSize : 100%;
+@tableSize : @cellSize * 10;
 @cellSize : 30px;
 
 .minesweeper-container {
@@ -21,19 +21,48 @@
     height: 70px;
     margin: 0 auto;
     text-align: center;
+    position: relative;
 
     a[class|='btn'] {
+      background-color: #20C2DE;
       font-family: @fontFamily;
       font-size: 1.5em;
       text-align: center;
       padding: 10px;
       text-decoration: none;
-      color: black;
+      color: #FFFFFF;
+      border-left: @borderWidth solid white;
+      border-top: @borderWidth solid white;
+      border-bottom: @borderWidth solid #117ABD;
+      border-right: @borderWidth solid #117ABD;
+    }
+
+    a[class|='btn']:active {
+      border-left: @borderWidth solid #117ABD;
+      border-top: @borderWidth solid #117ABD;
+      border-bottom: @borderWidth solid white;
+      border-right: @borderWidth solid white;
+      padding-left: 5px;
+      padding-right: 15px;
+      padding-top: 6px;
+      padding-bottom: 14px;
+    }
+
+    a.btn-close {
+      position: absolute;
+      top: -15px;
+      right: -150px;
+    }
+
+    .difficulty-menu-container {
+      position: absolute;
+      top: 0;
     }
   }
 
   .game-container {
     margin: 0 auto;
+    width: @tableSize + 60px;
     // width: inherit;
     .game-box {
       // width: inherit;
@@ -45,6 +74,9 @@
       border-right: @borderWidth solid #808080;
 
       .score-container {
+        overflow: hidden;
+        width: @tableSize;
+        margin: 0 auto;
         margin-bottom: 20px;
         // padding: 10px;
         background-color: #CCCCCC;
@@ -53,12 +85,15 @@
         border-top: @borderWidth solid #808080;
         border-left: @borderWidth solid #808080;
 
-        .display-time {
-
+        .display-count-bomb-left {
+          float: left;
         }
-        .display-state {
+        .display-status {
+          float: left;
+          // clear: both;
+          cursor: pointer;
           background-color: #CCCCCC;
-          background-image: url(https://png2.kisspng.com/sh/98219748cf673dee7aa975805180eb0e/L0KzQYi4UsE5N5YAUZGAYUO6RoS3gcdlamE3TZCAOEe8R4W3VME2OWQ6T6s7N0S4QYWBTwBvbz==/5a37630a7db025.5879740415135792745148.png);
+          background-image: url("https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true");
           background-repeat: no-repeat;
           background-position: center;
           border-left: @borderWidth solid white;
@@ -66,13 +101,62 @@
           border-bottom: @borderWidth solid #808080;
           border-right: @borderWidth solid #808080;
           border-radius: 2px;
-          width: 60px;
-          height: 60px;
-          background-size: 50px 50px;
-          margin: 10px auto;
+          width: 50px;
+          height: 50px;
+          background-size: 45px 45px;
+          margin: 16px auto;
         }
-        .display-score {
 
+        .display-status:active {
+          border-left: @borderWidth solid #808080;
+          border-top: @borderWidth solid #808080;
+          border-bottom: @borderWidth solid white;
+          border-right: @borderWidth solid white;
+          background-position: 4px 4px;
+        }
+
+        .dead {
+          background-image: url("https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true");
+        }
+
+        .display-timer {
+          float: right;
+          // border: 1px solid black;
+          // float: right;
+          // background-color: black;
+          // overflow: hidden;
+          // width: 90px;
+          // height: 60px;
+          // text-align: center;
+
+          .section-1 {
+
+          }
+          .section-2 {
+
+          }
+          .section-3 {
+
+          }
+        }
+        .digits-box {
+          margin: 15px 15px;
+          background-image: url('https://minesweeper.online/img/skins/hd/nums_background.svg');
+          background-size: 100% 100%;
+          overflow: hidden;
+          width: 90px;
+          height: 60px;
+
+          .digits {
+            float: left;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 24px;
+            height: 54px;
+            display: block;
+            margin: 3px;
+          }
         }
       }
 
@@ -84,48 +168,55 @@
         border-right: @borderWidth solid white;
         border-top: @borderWidth solid #808080;
         border-left: @borderWidth solid #808080;
+
+        .map-cell {
+          text-align: center;
+          width: @cellSize;
+          height: @cellSize;
+          cursor: pointer;
+          background-size: @cellSize @cellSize;
+          background-position: center;
+          // border : 1px solid #868686;
+          background-color: #C1C1C1;
+          background-repeat: no-repeat;
+        }
+
+        .blind {
+          position: relative;
+        }
+
+        td.blind::after {
+          top: 0;
+          left: 0;
+          position: absolute;
+          // display: block;
+          width: @cellSize - @borderWidth * 2;
+          height: @cellSize - @borderWidth * 2;
+          content: " ";
+          background-color: #CCCCCC;
+          border-left: @borderWidth solid white;
+          border-top: @borderWidth solid white;
+          border-bottom: @borderWidth solid #808080;
+          border-right: @borderWidth solid #808080;
+        }
+
+        td.flagged::after {
+          background-image: url('https://github.com/pardahlman/minesweeper/blob/master/Images/flagged.png?raw=true');
+          background-size: @cellSize @cellSize;
+          background-position: center;
+          pointer-events: none;
+        }
+
+        td.pushed::after {
+          border-color: #C1C1C1;
+          background-color: #C1C1C1;
+          // background-size: @cellSize @cellSize;
+          // top: 0;
+          // left: 0;
+        }
       }
     }
-
   }
-
-}
-
-
-
-
-.map-row {
-}
-
-.map-cell {
-  text-align: center;
-  width: @cellSize;
-  height: @cellSize;
-  cursor: pointer;
-  background-size: @cellSize @cellSize;
-  background-position: center;
-  // border : 1px solid #868686;
-  background-color: #C1C1C1;
-  background-repeat: no-repeat;
-}
-
-.blind {
-  position: relative;
-}
-
-td.blind::after {
-  top: 0;
-  left: 0;
-  position: absolute;
-  // display: block;
-  width: @cellSize - @borderWidth * 2;
-  height: @cellSize - @borderWidth * 2;
-  content: " ";
-  background-color: #CCCCCC;
-  border-left: @borderWidth solid white;
-  border-top: @borderWidth solid white;
-  border-bottom: @borderWidth solid #808080;
-  border-right: @borderWidth solid #808080;
 }
 
 .hide {
