@@ -809,6 +809,13 @@ module.exports = __webpack_require__(7);
     }
   });
 
+  scoreBoardContainer.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (e.target && e.target.className.includes('score-board-close')) {
+      scoreBoardContainer.classList.add('hide');
+    }
+  });
+
   btnContainer.addEventListener('click', function(e) {
     e.preventDefault();
     var mainMenus = document.querySelector('.main-menu-container');
@@ -819,7 +826,7 @@ module.exports = __webpack_require__(7);
     } else if (e.target && e.target.className.includes('score')) {
       scoreBoardContainer.classList.remove('hide');
       displayScoreBoard(scoreStorage);
-    } else if (e.target && e.target.className.includes('close')) {
+    } else if (e.target && e.target.className.includes('difficulty-close')) {
       difficultyMenus.classList.add('hide');
       mainMenus.classList.remove('hide');
     } else if (e.target.className.includes('beginner')) {
