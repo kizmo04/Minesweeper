@@ -3,7 +3,6 @@
   var size = 10;
   var quantity = 10;
   var countBombLeftQuantity = quantity;
-  var nonBombCellCount = Math.pow(size, 2) - quantity;
   var blindCellList = [];
   var nonBombCellList = [];
   var surroundElementsList = [];
@@ -15,6 +14,7 @@
   var count = 0;
   var cellsToOpen = [];
   var memo = [];
+  var prevCell;
   var smileIcon = document.querySelector('.display-status');
   var btnContainer = document.querySelector('.btn-container');
   var displayBombLeft = document.querySelector('.display-count-bomb-left');
@@ -24,6 +24,8 @@
   var scoreContainer = document.querySelector('.score-container');
   var scoreBoardContainer = document.querySelector('.score-board-container');
   var gameContainer = document.querySelector('.game-container');
+  var mainMenus = document.querySelector('.main-menu-container');
+  var difficultyMenus = document.querySelector('.difficulty-menu-container');
   var sourceImgUrl = {
     0: "url('https://minesweeper.online/img/skins/hd/type0.svg')",
     1: "url('https://minesweeper.online/img/skins/hd/type1.svg')",
@@ -113,8 +115,6 @@
   function loadTemplate() {
     scoreStorage = JSON.parse(window.localStorage.getItem("minesweeper"));
     if (!scoreStorage) scoreStorage = [];
-    nonBombCellCount = Math.pow(size, 2) - quantity;
-    // smileIcon.classList.remove('dead');
     smileIcon.style.backgroundImage = sourceImgUrl.wink;
     countBombLeftQuantity = quantity;
     countBombLeft(countBombLeftQuantity);
@@ -156,8 +156,6 @@
     e.preventDefault();
   }, false);
 
-  var prevCell;
-
   mineMapTable.addEventListener('mousemove', function(e) {
     e.preventDefault();
     if (e.target && e.target.tagName === 'TD') {
@@ -168,6 +166,53 @@
         prevCell = e.target;
         e.target.classList.add('pushed');
       }
+    }
+  });
+
+  mineMapTable.addEventListener('touchend', function(e) {
+
+    if (e.target && e.target.className.includes('blind')) {
+      if (isFirst) {
+        timerID = startTimer();
+        isFirst = false;
+      }
+
+      if (e.target.dataset.value === '*') {
+        blindCellList.forEach(function(item) {
+          item.classList.remove('blind');
+        });
+        smileIcon.style.backgroundImage = sourceImgUrl.dead;
+        e.target.style.backgroundImage = sourceImgUrl['*red'];
+        clearInterval(timerID);
+      } else if (e.target.className.includes('blind')) {
+        e.target.classList.remove('blind');
+        if (e.target.dataset.value === '0') {
+          var zeroCellList = findZeroCells(e.target);
+          zeroCellList.forEach(function(cell) {
+            cell.classList.remove('blind');
+          });
+        }
+        if (document.querySelectorAll('.blind').length === quantity) {
+          clearInterval(timerID);
+          smileIcon.style.backgroundImage = sourceImgUrl.victory;
+          var leftBombList = document.querySelectorAll('td[data-value="*"]');
+          leftBombList.forEach(function(item) {
+            item.classList.add('flagged');
+          });
+          userName = prompt('승리했습니다! 이름을 입력해주세요', 'user name');
+          var gameData = {};
+          gameData.date = new Date().toLocaleDateString();
+          gameData.username = userName;
+          gameData.difficulty = difficulty;
+          gameData.score = timerDisplay.dataset.time;
+          scoreStorage.push(gameData);
+          displayScoreBoard(scoreStorage);
+          scoreBoardContainer.classList.remove('hide');
+          window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
+        }
+      }
+
+
     }
   });
 
@@ -238,12 +283,10 @@
         blindCellList.forEach(function(item) {
           item.classList.remove('blind');
         });
-        // smileIcon.classList.add('dead');
         smileIcon.style.backgroundImage = sourceImgUrl.dead;
         e.target.style.backgroundImage = sourceImgUrl['*red'];
         clearInterval(timerID);
       } else if (e.target.className.includes('blind')) {
-        nonBombCellCount--;
         e.target.classList.remove('blind');
         if (e.target.dataset.value === '0') {
           var zeroCellList = findZeroCells(e.target);
@@ -258,8 +301,6 @@
           leftBombList.forEach(function(item) {
             item.classList.add('flagged');
           });
-          // 남은 폭탄들에 모두 자동으로 깃발 꽃아주기 (클릭 못하도록)
-          // 폭탄 아닌것들 다 열었는지 확인하는 조건 다른방법으로..
           userName = prompt('승리했습니다! 이름을 입력해주세요', 'user name');
           var gameData = {};
           gameData.date = new Date().toLocaleDateString();
@@ -295,20 +336,21 @@
     e.preventDefault();
     if (e.target && e.target.className.includes('score-board-close')) {
       scoreBoardContainer.classList.add('hide');
+      mainMenus.classList.remove('hide');
     }
   });
 
   btnContainer.addEventListener('click', function(e) {
+    console.log(typeof e.target.className)
     e.preventDefault();
-    var mainMenus = document.querySelector('.main-menu-container');
-    var difficultyMenus = document.querySelector('.difficulty-menu-container');
     if (e.target && e.target.className.includes('difficulty')) {
       difficultyMenus.classList.remove('hide');
       mainMenus.classList.add('hide');
     } else if (e.target && e.target.className.includes('score')) {
       scoreBoardContainer.classList.remove('hide');
+      mainMenus.classList.add('hide');
       displayScoreBoard(scoreStorage);
-    } else if (e.target && e.target.className.includes('difficulty-close')) {
+    } else if (e.target && e.target.className.includes('close')) {
       difficultyMenus.classList.add('hide');
       mainMenus.classList.remove('hide');
     } else if (e.target.className.includes('beginner')) {
