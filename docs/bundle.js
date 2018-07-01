@@ -540,6 +540,7 @@ module.exports = __webpack_require__(7);
   var mineMapTable = document.querySelector('#minesweeper');
   var timerDisplay = document.querySelector('.display-timer');
   var scoreBoard = document.querySelector('.score-board');
+  var scoreContainer = document.querySelector('.score-container');
   var scoreBoardContainer = document.querySelector('.score-board-container');
   var gameContainer = document.querySelector('.game-container');
   var sourceImgUrl = {
@@ -837,7 +838,7 @@ module.exports = __webpack_require__(7);
       quantity = 10;
       difficuty = "easy";
       gameContainer.style.width = (30 * size + 60) + 'px';
-      scoreBoardContainer.style.width = (30 * size) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('amateur')) {
       difficultyMenus.classList.add('hide');
@@ -847,7 +848,7 @@ module.exports = __webpack_require__(7);
       quantity = 40;
       difficuty = "normal";
       gameContainer.style.width = (30 * size + 60) + 'px';
-      scoreBoardContainer.style.width = (30 * size) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('expert')) {
       difficultyMenus.classList.add('hide');
@@ -857,7 +858,7 @@ module.exports = __webpack_require__(7);
       quantity = 100;
       difficuty = "hard";
       gameContainer.style.width = (30 * size + 60) + 'px';
-      scoreBoardContainer.style.width = (30 * size) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     }
   });
