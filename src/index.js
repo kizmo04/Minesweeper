@@ -8,17 +8,20 @@
   var nonBombCellList = [];
   var surroundElementsList = [];
   var timerID;
-  var difficulty;
+  var difficulty = 'easy';
   var userName;
   var isFirst = true;
   var scoreStorage;
+  var count = 0;
+  var cellsToOpen = [];
+  var memo = [];
   var smileIcon = document.querySelector('.display-status');
   var btnContainer = document.querySelector('.btn-container');
   var displayBombLeft = document.querySelector('.display-count-bomb-left');
   var mineMapTable = document.querySelector('#minesweeper');
   var timerDisplay = document.querySelector('.display-timer');
   var scoreBoard = document.querySelector('.score-board');
-  var scoreContainer = document.querySelector('.score-container');
+  var scoreBoardContainer = document.querySelector('.score-board-container');
   var gameContainer = document.querySelector('.game-container');
   var sourceImgUrl = {
     0: "url('https://minesweeper.online/img/skins/hd/type0.svg')",
@@ -107,8 +110,8 @@
   }
 
   function loadTemplate() {
-    scoreStorage = window.localStorage.getItem("minesweeper");
-    if (scoreStorage) scoreStorage = [];
+    scoreStorage = JSON.parse(window.localStorage.getItem("minesweeper"));
+    if (!scoreStorage) scoreStorage = [];
     nonBombCellCount = Math.pow(size, 2) - quantity;
     // smileIcon.classList.remove('dead');
     smileIcon.style.backgroundImage = sourceImgUrl.wink;
@@ -128,7 +131,6 @@
         mapCell.classList.add('map-cell');
         mapCell.classList.add('blind');
         mapCell.dataset.value = mineMap[i][j];
-        mapCell.dataset.flagged = false;
         mapCell.style.backgroundImage = sourceImgUrl[mineMap[i][j]];
         mapCell.dataset.index = i * size + j;
         mapRow.appendChild(mapCell);
@@ -172,15 +174,14 @@
     if (e.target && e.target.className.includes('blind')) {
       smileIcon.style.backgroundImage = sourceImgUrl.hmm;
       if (e.buttons === 2) {
-        if (e.target.dataset.flagged === 'false') {
+        if (!e.target.className.includes('flagged')) {
           e.target.classList.add('flagged');
-          e.target.dataset.flagged = true;
           countBombLeft(--countBombLeftQuantity);
         } else {
           e.target.classList.remove('flagged');
           countBombLeft(++countBombLeftQuantity);
         }
-      } else if (e.buttons === 1) {
+      } else if (e.buttons === 1 && !e.target.className.includes('flagged')) {
         if (prevCell) {
           prevCell.classList.remove('pushed');
         }
@@ -190,7 +191,7 @@
     } else if (e.target.dataset.value !== '0'){
       surroundElementsList = findSurroundElements(parseInt(e.target.dataset.index));
       surroundElementsList.forEach(function(element) {
-        if (element) element.classList.add('pushed');
+        if (element && !element.className.includes('flagged')) element.classList.add('pushed');
       });
     }
   });
@@ -217,14 +218,15 @@
   }
 
   mineMapTable.addEventListener('mouseup', function(e) {
-    if (e.target.className.includes('blind')) smileIcon.style.backgroundImage = sourceImgUrl.wink;
+    smileIcon.style.backgroundImage = sourceImgUrl.wink;
     if (surroundElementsList.length > 0) {
       surroundElementsList.forEach(function(element) {
-        if (element) element.classList.remove('pushed');
+        if (element && !element.className.includes('flagged')) element.classList.remove('pushed');
       });
+      surroundElementsList.length = 0;
     }
 
-    if (e.target && e.target.className.includes('blind') && e.target.dataset.flagged === 'false') {
+    if (e.target && e.target.className.includes('blind') && e.target.className.includes('pushed')) {
       if (isFirst) {
         timerID = startTimer();
         isFirst = false;
@@ -243,15 +245,18 @@
         nonBombCellCount--;
         e.target.classList.remove('blind');
         if (e.target.dataset.value === '0') {
-          console.log('zero!')
           var zeroCellList = findZeroCells(e.target);
           zeroCellList.forEach(function(cell) {
             cell.classList.remove('blind');
           });
         }
-        if (nonBombCellCount === 0) {
+        if (document.querySelectorAll('.blind').length === quantity) {
           clearInterval(timerID);
           smileIcon.style.backgroundImage = sourceImgUrl.victory;
+          var leftBombList = document.querySelectorAll('td[data-value="*"]');
+          leftBombList.forEach(function(item) {
+            item.classList.add('flagged');
+          });
           // 남은 폭탄들에 모두 자동으로 깃발 꽃아주기 (클릭 못하도록)
           // 폭탄 아닌것들 다 열었는지 확인하는 조건 다른방법으로..
           userName = prompt('승리했습니다! 이름을 입력해주세요', 'user name');
@@ -261,12 +266,11 @@
           gameData.difficulty = difficulty;
           gameData.score = timerDisplay.dataset.time;
           scoreStorage.push(gameData);
-          scoreBoard.classList.remove('hide');
+          displayScoreBoard(scoreStorage);
+          scoreBoardContainer.classList.remove('hide');
           window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
       }
-    } else if (e.target.dataset.flagged !== 'false' && !e.target.className.includes('flagged')) {
-      e.target.flagged = false;
     }
   });
 
@@ -294,8 +298,8 @@
       difficultyMenus.classList.remove('hide');
       mainMenus.classList.add('hide');
     } else if (e.target && e.target.className.includes('score')) {
-      scoreBoard.classList.remove('hide');
-
+      scoreBoardContainer.classList.remove('hide');
+      displayScoreBoard(scoreStorage);
     } else if (e.target && e.target.className.includes('close')) {
       difficultyMenus.classList.add('hide');
       mainMenus.classList.remove('hide');
@@ -305,9 +309,9 @@
 
       size = 10;
       quantity = 10;
-      difficuty = "beginner";
+      difficuty = "easy";
       gameContainer.style.width = (30 * size + 60) + 'px';
-      scoreContainer.style.width = (30 * size) + 'px';
+      scoreBoardContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('amateur')) {
       difficultyMenus.classList.add('hide');
@@ -315,9 +319,9 @@
 
       size = 15;
       quantity = 40;
-      difficuty = "amateur";
+      difficuty = "normal";
       gameContainer.style.width = (30 * size + 60) + 'px';
-      scoreContainer.style.width = (30 * size) + 'px';
+      scoreBoardContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('expert')) {
       difficultyMenus.classList.add('hide');
@@ -325,9 +329,9 @@
 
       size = 20;
       quantity = 100;
-      difficuty = "expert";
+      difficuty = "hard";
       gameContainer.style.width = (30 * size + 60) + 'px';
-      scoreContainer.style.width = (30 * size) + 'px';
+      scoreBoardContainer.style.width = (30 * size) + 'px';
       startGame();
     }
   });
@@ -348,9 +352,7 @@
     }
     return setInterval(changeDigits, 1000);
   }
-var count = 0;
-var cellsToOpen = [];
-var memo = [];
+
   function findZeroCells(cell) {
 
     if (cell.dataset.value !== '0' && cell.dataset.value !== '*') {
@@ -371,7 +373,7 @@ var memo = [];
     var rightCell = document.querySelector('td[data-index="' + rightIndex + '"]');
     var upCell = document.querySelector('td[data-index="' + prevRowIndex + '"]');
     var downCell = document.querySelector('td[data-index="' + nextRowIndex + '"]');
-    console.log(memo, count++)
+
     if (leftCell && !memo.includes(leftCell) && (parseInt(cell.dataset.index) % size) !== 0) cellsToOpen.concat(findZeroCells(leftCell));
     if (rightCell && !memo.includes(rightCell) && (parseInt(cell.dataset.index) % size) !== (size - 1)) cellsToOpen.concat(findZeroCells(rightCell));
     if (upCell && !memo.includes(upCell)) cellsToOpen.concat(findZeroCells(upCell));
@@ -380,6 +382,24 @@ var memo = [];
     return cellsToOpen;
   }
 
+  function displayScoreBoard(scoreStorageData) {
+    scoreStorageData.forEach(function(item) {
+      var record = scoreBoard.insertRow();
+      record.classList.add('score-list');
+      var dateCell = record.insertCell();
+      dateCell.textContent = item.date;
+      dateCell.classList.add('td-date');
+      var usernameCell = record.insertCell();
+      usernameCell.textContent = item.username;
+      usernameCell.classList.add('td-username');
+      var difficultyCell = record.insertCell();
+      difficultyCell.textContent = item.difficulty;
+      difficultyCell.classList.add('td-difficulty');
+      var scoreCell = record.insertCell();
+      scoreCell.textContent = item.score;
+      scoreCell.classList.add('td-score');
+    });
+  }
 
   var bombList = makeBomb();
   var map = createMap();

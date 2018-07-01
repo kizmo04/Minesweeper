@@ -1,8 +1,16 @@
 
 @borderWidth: 4px;
-@fontFamily: 'NanumSquare', sans-serif;
 @tableSize : @cellSize * 10;
+@fontFamily: 'Bungee Shade', cursive;
 @cellSize : 30px;
+
+body {
+  background-color: black;
+}
+
+h1 {
+  color: rgb(255, 230, 0);
+}
 
 .minesweeper-container {
   width: 50%;
@@ -22,31 +30,6 @@
     margin: 0 auto;
     text-align: center;
     position: relative;
-
-    a[class|='btn'] {
-      background-color: #20C2DE;
-      font-family: @fontFamily;
-      font-size: 1.5em;
-      text-align: center;
-      padding: 10px;
-      text-decoration: none;
-      color: #FFFFFF;
-      border-left: @borderWidth solid white;
-      border-top: @borderWidth solid white;
-      border-bottom: @borderWidth solid #117ABD;
-      border-right: @borderWidth solid #117ABD;
-    }
-
-    a[class|='btn']:active {
-      border-left: @borderWidth solid #117ABD;
-      border-top: @borderWidth solid #117ABD;
-      border-bottom: @borderWidth solid white;
-      border-right: @borderWidth solid white;
-      padding-left: 5px;
-      padding-right: 15px;
-      padding-top: 6px;
-      padding-bottom: 14px;
-    }
 
     a.btn-close {
       position: absolute;
@@ -234,18 +217,98 @@
   display: none;
 }
 
+a[class|='btn'] {
+  background-color: rgb(255, 230, 0);
+  font-family: @fontFamily;
+  font-size: 1.5em;
+  text-align: center;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+  border-left: @borderWidth solid white;
+  border-top: @borderWidth solid white;
+  border-bottom: @borderWidth solid rgb(253, 195, 6);
+  border-right: @borderWidth solid rgb(253, 195, 6);
+}
+
+a[class|='btn']:active {
+  border-left: @borderWidth solid #117ABD;
+  border-top: @borderWidth solid #117ABD;
+  border-bottom: @borderWidth solid white;
+  border-right: @borderWidth solid white;
+  padding-left: 5px;
+  padding-right: 15px;
+  padding-top: 6px;
+  padding-bottom: 14px;
+}
+
 .score-board-container {
   position: absolute;
   top: 170px;
   width: 50%;
+  background-color: black;
+  border: 10px solid rgb(253, 195, 6);
+  border-radius: 10px;
 
+  .score-board-title-container {
+    width: 100%;
+    border-bottom: none;
+    text-align: center;
+
+    .score-board-title {
+      color: rgb(253, 195, 6);
+      font-family: @fontFamily;
+      font-size: 3em;
+    }
+
+    a.btn-close {
+      background-color: black;
+      border: 10px solid rgb(253, 195, 6);
+      border-radius: 10px;
+      position: absolute;
+      top: -10px;
+      right: -120px;
+      color : rgb(253, 195, 6);
+    }
+  }
   .score-board {
-    background-color: black;
+    // background-color: black;
+    width: 100%;
+    // border: 10px solid rgb(253, 195, 6);
+    // border-radius: 10px;
 
     .score-list {
-      font-size: 2em;
+      width: 100%;
+      font-size: 1em;
       color: red;
       font-family: @fontFamily;
+
+      td[class|="td"] {
+        font-family: @fontFamily;
+        font-size: 1em;
+        padding: 10px 10px;
+      }
+
+      th[class|="td"] {
+        font-family: @fontFamily;
+        font-size: 1em;
+      }
+
+      .td-date {
+
+      }
+
+      .td-username {
+
+      }
+
+      .td-difficulty {
+
+      }
+
+      .td-score {
+
+      }
     }
   }
 }
