@@ -527,24 +527,34 @@ module.exports = __webpack_require__(7);
   var nonBombCellList = [];
   var surroundElementsList = [];
   var timerID;
+  var difficulty;
+  var userName;
   var isFirst = true;
+  var scoreStorage;
   var smileIcon = document.querySelector('.display-status');
   var btnContainer = document.querySelector('.btn-container');
   var displayBombLeft = document.querySelector('.display-count-bomb-left');
   var mineMapTable = document.querySelector('#minesweeper');
   var timerDisplay = document.querySelector('.display-timer');
+  var scoreBoard = document.querySelector('.score-board');
+  var scoreContainer = document.querySelector('.score-container');
+  var gameContainer = document.querySelector('.game-container');
   var sourceImgUrl = {
-    0: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/0.png?raw=true')",
-    1: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/1.png?raw=true')",
-    2: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/2.png?raw=true')",
-    3: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/3.png?raw=true')",
-    4: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/4.png?raw=true')",
-    5: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/5.png?raw=true')",
-    6: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/6.png?raw=true')",
-    7: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/7.png?raw=true')",
-    8: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/8.png?raw=true')",
-    '*': "url('https://github.com/pardahlman/minesweeper/blob/master/Images/bomb.png?raw=true')",
-    'dead': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true')"
+    0: "url('https://minesweeper.online/img/skins/hd/type0.svg')",
+    1: "url('https://minesweeper.online/img/skins/hd/type1.svg')",
+    2: "url('https://minesweeper.online/img/skins/hd/type2.svg')",
+    3: "url('https://minesweeper.online/img/skins/hd/type3.svg')",
+    4: "url('https://minesweeper.online/img/skins/hd/type4.svg')",
+    5: "url('https://minesweeper.online/img/skins/hd/type5.svg')",
+    6: "url('https://minesweeper.online/img/skins/hd/type6.svg')",
+    7: "url('https://minesweeper.online/img/skins/hd/type7.svg')",
+    8: "url('https://minesweeper.online/img/skins/hd/type8.svg')",
+    '*': "url('https://minesweeper.online/img/skins/hd/mine.svg')",
+    '*red': "url('https://minesweeper.online/img/skins/hd/mine_red.svg')",
+    'dead': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true')",
+    'victory': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/victory-emoji.png?raw=true')",
+    'hmm': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/hmm-emoji.png?raw=true')",
+    'wink': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true')"
   };
   var digitImgUrl = {
     0: "url('https://minesweeper.online/img/skins/hd/d0.svg')",
@@ -616,8 +626,11 @@ module.exports = __webpack_require__(7);
   }
 
   function loadTemplate() {
+    scoreStorage = window.localStorage.getItem("minesweeper");
+    if (scoreStorage) scoreStorage = [];
     nonBombCellCount = Math.pow(size, 2) - quantity;
-    smileIcon.classList.remove('dead');
+    // smileIcon.classList.remove('dead');
+    smileIcon.style.backgroundImage = sourceImgUrl.wink;
     countBombLeftQuantity = quantity;
     countBombLeft(countBombLeftQuantity);
     if (timerID) clearInterval(timerID);
@@ -634,6 +647,7 @@ module.exports = __webpack_require__(7);
         mapCell.classList.add('map-cell');
         mapCell.classList.add('blind');
         mapCell.dataset.value = mineMap[i][j];
+        mapCell.dataset.flagged = false;
         mapCell.style.backgroundImage = sourceImgUrl[mineMap[i][j]];
         mapCell.dataset.index = i * size + j;
         mapRow.appendChild(mapCell);
@@ -675,21 +689,22 @@ module.exports = __webpack_require__(7);
 
   mineMapTable.addEventListener('mousedown', function(e) {
     if (e.target && e.target.className.includes('blind')) {
+      smileIcon.style.backgroundImage = sourceImgUrl.hmm;
       if (e.buttons === 2) {
-        e.target.classList.toggle('flagged');
-        if (e.target.dataset.flagged) {
-          e.target.dataset.flagged = false;
-          countBombLeft(++countBombLeftQuantity);
-        } else {
+        if (e.target.dataset.flagged === 'false') {
+          e.target.classList.add('flagged');
           e.target.dataset.flagged = true;
           countBombLeft(--countBombLeftQuantity);
+        } else {
+          e.target.classList.remove('flagged');
+          countBombLeft(++countBombLeftQuantity);
         }
-      } else if (e.buttons === 0) {
+      } else if (e.buttons === 1) {
         if (prevCell) {
           prevCell.classList.remove('pushed');
         }
-        prevCell = e.target;
         e.target.classList.add('pushed');
+        prevCell = e.target;
       }
     } else if (e.target.dataset.value !== '0'){
       surroundElementsList = findSurroundElements(parseInt(e.target.dataset.index));
@@ -721,35 +736,56 @@ module.exports = __webpack_require__(7);
   }
 
   mineMapTable.addEventListener('mouseup', function(e) {
+    if (e.target.className.includes('blind')) smileIcon.style.backgroundImage = sourceImgUrl.wink;
     if (surroundElementsList.length > 0) {
       surroundElementsList.forEach(function(element) {
         if (element) element.classList.remove('pushed');
       });
     }
 
-    if (e.target && e.target.tagName === 'TD' && !e.target.dataset.flagged) {
-      if (e.buttons === 0) {
-        if (isFirst) {
-          timerID = startTimer();
-          isFirst = false;
-        }
-        e.target.classList.remove('pushed');
+    if (e.target && e.target.className.includes('blind') && e.target.dataset.flagged === 'false') {
+      if (isFirst) {
+        timerID = startTimer();
+        isFirst = false;
+      }
+      e.target.classList.remove('pushed');
+      prevCell = null;
+      if (e.target.dataset.value === '*') {
+        blindCellList.forEach(function(item) {
+          item.classList.remove('blind');
+        });
+        // smileIcon.classList.add('dead');
+        smileIcon.style.backgroundImage = sourceImgUrl.dead;
+        e.target.style.backgroundImage = sourceImgUrl['*red'];
+        clearInterval(timerID);
+      } else if (e.target.className.includes('blind')) {
+        nonBombCellCount--;
         e.target.classList.remove('blind');
-        prevCell = null;
-        if (e.target.dataset.value === '*') {
-          blindCellList.forEach(function(item) {
-            item.classList.remove('blind');
+        if (e.target.dataset.value === '0') {
+          console.log('zero!')
+          var zeroCellList = findZeroCells(e.target);
+          zeroCellList.forEach(function(cell) {
+            cell.classList.remove('blind');
           });
-          smileIcon.classList.add('dead');
-        } else {
-          e.target.classList.remove('blind');
-          // nonBombCellList.pop();
-          nonBombCellCount--;
-          if (nonBombCellCount === 0) {
-            alert('끝!');
-          }
+        }
+        if (nonBombCellCount === 0) {
+          clearInterval(timerID);
+          smileIcon.style.backgroundImage = sourceImgUrl.victory;
+          // 남은 폭탄들에 모두 자동으로 깃발 꽃아주기 (클릭 못하도록)
+          // 폭탄 아닌것들 다 열었는지 확인하는 조건 다른방법으로..
+          userName = prompt('승리했습니다! 이름을 입력해주세요', 'user name');
+          var gameData = {};
+          gameData.date = new Date().toLocaleDateString();
+          gameData.username = userName;
+          gameData.difficulty = difficulty;
+          gameData.score = timerDisplay.dataset.time;
+          scoreStorage.push(gameData);
+          scoreBoard.classList.remove('hide');
+          window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
       }
+    } else if (e.target.dataset.flagged !== 'false' && !e.target.className.includes('flagged')) {
+      e.target.flagged = false;
     }
   });
 
@@ -777,6 +813,7 @@ module.exports = __webpack_require__(7);
       difficultyMenus.classList.remove('hide');
       mainMenus.classList.add('hide');
     } else if (e.target && e.target.className.includes('score')) {
+      scoreBoard.classList.remove('hide');
 
     } else if (e.target && e.target.className.includes('close')) {
       difficultyMenus.classList.add('hide');
@@ -787,6 +824,9 @@ module.exports = __webpack_require__(7);
 
       size = 10;
       quantity = 10;
+      difficuty = "beginner";
+      gameContainer.style.width = (30 * size + 60) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('amateur')) {
       difficultyMenus.classList.add('hide');
@@ -794,6 +834,9 @@ module.exports = __webpack_require__(7);
 
       size = 15;
       quantity = 40;
+      difficuty = "amateur";
+      gameContainer.style.width = (30 * size + 60) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('expert')) {
       difficultyMenus.classList.add('hide');
@@ -801,6 +844,9 @@ module.exports = __webpack_require__(7);
 
       size = 20;
       quantity = 100;
+      difficuty = "expert";
+      gameContainer.style.width = (30 * size + 60) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     }
   });
@@ -816,9 +862,41 @@ module.exports = __webpack_require__(7);
       timerDisplay.querySelector('.section-1').style.backgroundImage = digitImgUrl[timeDigitsToString.charAt(0)];
       timerDisplay.querySelector('.section-2').style.backgroundImage = digitImgUrl[timeDigitsToString.charAt(1)];
       timerDisplay.querySelector('.section-3').style.backgroundImage = digitImgUrl[timeDigitsToString.charAt(2)];
+      timerDisplay.dataset.time = timeDigitsToString;
       timeDigits++;
     }
     return setInterval(changeDigits, 1000);
+  }
+var count = 0;
+var cellsToOpen = [];
+var memo = [];
+  function findZeroCells(cell) {
+
+    if (cell.dataset.value !== '0' && cell.dataset.value !== '*') {
+      cellsToOpen.push(cell);
+      return cellsToOpen;
+    }
+
+    if (!memo.includes(cell)) {
+      memo.push(cell);
+      if (cell.dataset.value !== '*') cellsToOpen.push(cell);
+    }
+    var leftIndex = parseInt(cell.dataset.index) - 1;
+    var rightIndex = parseInt(cell.dataset.index) + 1;
+    var prevRowIndex = parseInt(cell.dataset.index) - size;
+    var nextRowIndex = parseInt(cell.dataset.index) + size;
+
+    var leftCell = document.querySelector('td[data-index="' + leftIndex + '"]');
+    var rightCell = document.querySelector('td[data-index="' + rightIndex + '"]');
+    var upCell = document.querySelector('td[data-index="' + prevRowIndex + '"]');
+    var downCell = document.querySelector('td[data-index="' + nextRowIndex + '"]');
+    console.log(memo, count++)
+    if (leftCell && !memo.includes(leftCell) && (parseInt(cell.dataset.index) % size) !== 0) cellsToOpen.concat(findZeroCells(leftCell));
+    if (rightCell && !memo.includes(rightCell) && (parseInt(cell.dataset.index) % size) !== (size - 1)) cellsToOpen.concat(findZeroCells(rightCell));
+    if (upCell && !memo.includes(upCell)) cellsToOpen.concat(findZeroCells(upCell));
+    if (downCell && !memo.includes(downCell)) cellsToOpen.concat(findZeroCells(downCell));
+
+    return cellsToOpen;
   }
 
 
@@ -1023,7 +1101,7 @@ exports = module.exports = __webpack_require__(0)(false);
 
 
 // module
-exports.push([module.i, ".minesweeper-container {\n  width: 50%;\n  margin: 0 auto;\n  padding: 100px 0;\n}\n.minesweeper-container #title {\n  font-size: 3em;\n  font-family: 'NanumSquare', sans-serif;\n  text-align: center;\n  padding: 20px;\n}\n.minesweeper-container .btn-container {\n  width: 90%;\n  height: 70px;\n  margin: 0 auto;\n  text-align: center;\n  position: relative;\n}\n.minesweeper-container .btn-container a[class|='btn'] {\n  background-color: #20C2DE;\n  font-family: 'NanumSquare', sans-serif;\n  font-size: 1.5em;\n  text-align: center;\n  padding: 10px;\n  text-decoration: none;\n  color: #FFFFFF;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #117ABD;\n  border-right: 4px solid #117ABD;\n}\n.minesweeper-container .btn-container a[class|='btn']:active {\n  border-left: 4px solid #117ABD;\n  border-top: 4px solid #117ABD;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  padding-left: 5px;\n  padding-right: 15px;\n  padding-top: 6px;\n  padding-bottom: 14px;\n}\n.minesweeper-container .btn-container a.btn-close {\n  position: absolute;\n  top: -15px;\n  right: -150px;\n}\n.minesweeper-container .btn-container .difficulty-menu-container {\n  position: absolute;\n  top: 0;\n}\n.minesweeper-container .game-container {\n  margin: 0 auto;\n  width: 360px;\n}\n.minesweeper-container .game-container .game-box {\n  padding: 20px;\n  background-color: #CCCCCC;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box .score-container {\n  overflow: hidden;\n  width: 300px;\n  margin: 0 auto;\n  margin-bottom: 20px;\n  background-color: #CCCCCC;\n  border-right: 4px solid white;\n  border-bottom: 4px solid white;\n  border-top: 4px solid #808080;\n  border-left: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box .score-container .display-count-bomb-left {\n  float: left;\n}\n.minesweeper-container .game-container .game-box .score-container .display-status {\n  float: left;\n  cursor: pointer;\n  background-color: #CCCCCC;\n  background-image: url(\"https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true\");\n  background-repeat: no-repeat;\n  background-position: center;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n  border-radius: 2px;\n  width: 50px;\n  height: 50px;\n  background-size: 45px 45px;\n  margin: 16px auto;\n}\n.minesweeper-container .game-container .game-box .score-container .display-status:active {\n  border-left: 4px solid #808080;\n  border-top: 4px solid #808080;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  background-position: 4px 4px;\n}\n.minesweeper-container .game-container .game-box .score-container .dead {\n  background-image: url(\"https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true\");\n}\n.minesweeper-container .game-container .game-box .score-container .display-timer {\n  float: right;\n}\n.minesweeper-container .game-container .game-box .score-container .digits-box {\n  margin: 15px 15px;\n  background-image: url('https://minesweeper.online/img/skins/hd/nums_background.svg');\n  background-size: 100% 100%;\n  overflow: hidden;\n  width: 90px;\n  height: 60px;\n}\n.minesweeper-container .game-container .game-box .score-container .digits-box .digits {\n  float: left;\n  background-size: 100% 100%;\n  background-position: center;\n  background-repeat: no-repeat;\n  width: 24px;\n  height: 54px;\n  display: block;\n  margin: 3px;\n}\n.minesweeper-container .game-container .game-box table#minesweeper {\n  margin: 0 auto;\n  width: inherit;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  border-top: 4px solid #808080;\n  border-left: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box table#minesweeper .map-cell {\n  text-align: center;\n  width: 30px;\n  height: 30px;\n  cursor: pointer;\n  background-size: 30px 30px;\n  background-position: center;\n  background-color: #C1C1C1;\n  background-repeat: no-repeat;\n}\n.minesweeper-container .game-container .game-box table#minesweeper .blind {\n  position: relative;\n}\n.minesweeper-container .game-container .game-box table#minesweeper td.blind::after {\n  top: 0;\n  left: 0;\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  content: \" \";\n  background-color: #CCCCCC;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box table#minesweeper td.flagged::after {\n  background-image: url('https://github.com/pardahlman/minesweeper/blob/master/Images/flagged.png?raw=true');\n  background-size: 30px 30px;\n  background-position: center;\n  pointer-events: none;\n}\n.minesweeper-container .game-container .game-box table#minesweeper td.pushed::after {\n  border-color: #C1C1C1;\n  background-color: #C1C1C1;\n}\n.hide {\n  display: none;\n}\n", ""]);
+exports.push([module.i, ".minesweeper-container {\n  width: 50%;\n  margin: 0 auto;\n  padding: 100px 0;\n}\n.minesweeper-container #title {\n  font-size: 3em;\n  font-family: 'NanumSquare', sans-serif;\n  text-align: center;\n  padding: 20px;\n}\n.minesweeper-container .btn-container {\n  width: 90%;\n  height: 70px;\n  margin: 0 auto;\n  text-align: center;\n  position: relative;\n}\n.minesweeper-container .btn-container a[class|='btn'] {\n  background-color: #20C2DE;\n  font-family: 'NanumSquare', sans-serif;\n  font-size: 1.5em;\n  text-align: center;\n  padding: 10px;\n  text-decoration: none;\n  color: #FFFFFF;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #117ABD;\n  border-right: 4px solid #117ABD;\n}\n.minesweeper-container .btn-container a[class|='btn']:active {\n  border-left: 4px solid #117ABD;\n  border-top: 4px solid #117ABD;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  padding-left: 5px;\n  padding-right: 15px;\n  padding-top: 6px;\n  padding-bottom: 14px;\n}\n.minesweeper-container .btn-container a.btn-close {\n  position: absolute;\n  top: -15px;\n  right: -150px;\n}\n.minesweeper-container .btn-container .difficulty-menu-container {\n  position: absolute;\n  top: 0;\n}\n.minesweeper-container .game-container {\n  margin: 0 auto;\n  width: 360px;\n}\n.minesweeper-container .game-container .game-box {\n  padding: 20px;\n  background-color: #CCCCCC;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box .score-container {\n  overflow: hidden;\n  width: 300px;\n  margin: 0 auto;\n  margin-bottom: 20px;\n  background-color: #CCCCCC;\n  border-right: 4px solid white;\n  border-bottom: 4px solid white;\n  border-top: 4px solid #808080;\n  border-left: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box .score-container .section {\n  width: 33%;\n  overflow: hidden;\n  float: left;\n}\n.minesweeper-container .game-container .game-box .score-container .section .display-count-bomb-left {\n  margin: 16px auto;\n}\n.minesweeper-container .game-container .game-box .score-container .section .display-status {\n  cursor: pointer;\n  background-color: #CCCCCC;\n  background-image: url(\"https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true\");\n  background-repeat: no-repeat;\n  background-position: center;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n  border-radius: 2px;\n  width: 50px;\n  height: 50px;\n  background-size: 45px 45px;\n  margin: 16px auto;\n}\n.minesweeper-container .game-container .game-box .score-container .section .display-status:active {\n  border-left: 4px solid #808080;\n  border-top: 4px solid #808080;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  background-position: 4px 4px;\n}\n.minesweeper-container .game-container .game-box .score-container .section .dead {\n  background-image: url(\"https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true\");\n}\n.minesweeper-container .game-container .game-box .score-container .section .display-timer {\n  margin: 16px auto;\n}\n.minesweeper-container .game-container .game-box .score-container .section .digits-box {\n  margin: 15px auto;\n  background-image: url('https://minesweeper.online/img/skins/hd/nums_background.svg');\n  background-size: 100% 100%;\n  overflow: hidden;\n  width: 90px;\n  height: 60px;\n}\n.minesweeper-container .game-container .game-box .score-container .section .digits-box .digits {\n  float: left;\n  background-size: 100% 100%;\n  background-position: center;\n  background-repeat: no-repeat;\n  width: 24px;\n  height: 54px;\n  display: block;\n  margin: 3px;\n}\n.minesweeper-container .game-container .game-box table#minesweeper {\n  margin: 0 auto;\n  width: inherit;\n  border-bottom: 4px solid white;\n  border-right: 4px solid white;\n  border-top: 4px solid #808080;\n  border-left: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box table#minesweeper .map-cell {\n  text-align: center;\n  width: 30px;\n  height: 30px;\n  cursor: pointer;\n  background-size: 30px 30px;\n  background-position: center;\n  background-color: #C1C1C1;\n  background-repeat: no-repeat;\n}\n.minesweeper-container .game-container .game-box table#minesweeper .blind {\n  position: relative;\n}\n.minesweeper-container .game-container .game-box table#minesweeper td.blind::after {\n  top: 0;\n  left: 0;\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  content: \" \";\n  background-color: #CCCCCC;\n  border-left: 4px solid white;\n  border-top: 4px solid white;\n  border-bottom: 4px solid #808080;\n  border-right: 4px solid #808080;\n}\n.minesweeper-container .game-container .game-box table#minesweeper td.flagged::after {\n  background-image: url('https://minesweeper.online/img/skins/hd/flag.svg');\n  background-size: 30px 30px;\n  background-position: center;\n  pointer-events: none;\n}\n.minesweeper-container .game-container .game-box table#minesweeper td.pushed::after {\n  background-image: url('https://minesweeper.online/img/skins/hd/type0.svg');\n  width: 30px;\n  height: 30px;\n  border: none;\n  background-size: 30px 30px;\n}\n.hide {\n  display: none;\n}\n.score-board-container {\n  position: absolute;\n  top: 170px;\n  width: 50%;\n}\n.score-board-container .score-board {\n  background-color: black;\n}\n.score-board-container .score-board .score-list {\n  font-size: 2em;\n  color: red;\n  font-family: 'NanumSquare', sans-serif;\n}\n", ""]);
 
 // exports
 

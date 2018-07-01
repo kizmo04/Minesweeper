@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css">
-  <title>JS Bin</title>
+  <title>Minesweeper</title>
 </head>
 <body>
   <div class="minesweeper-container">
@@ -14,7 +14,7 @@
       <div class="main-menu-container">
         <a class="btn-difficulty" href="">난이도</a>
         <!-- <a class="btn-load" href="">불러오기</a> -->
-        <a class="btn-score" href="">점수 보기</a>
+        <a class="btn-score" href="">기록 보기</a>
         <!-- <a class="btn-retry hide" href="">다시하기</a> -->
       </div>
       <div class="difficulty-menu-container hide">
@@ -29,20 +29,33 @@
     <div class="game-container">
       <div class="game-box">
         <div class="score-container">
-          <div class="display-count-bomb-left digits-box">
-            <span class="section-1 digits"> </span>
-            <span class="section-2 digits"> </span>
-            <span class="section-3 digits"> </span>
+          <div class="section">
+            <div class="display-count-bomb-left digits-box">
+              <span class="section-1 digits"> </span>
+              <span class="section-2 digits"> </span>
+              <span class="section-3 digits"> </span>
+            </div>
           </div>
-          <div class="display-status"></div>
-          <div class="display-timer digits-box">
-            <span class="section-1 digits"> </span>
-            <span class="section-2 digits"> </span>
-            <span class="section-3 digits"> </span>
+          <div class="section">
+            <div class="display-status"></div>
+          </div>
+          <div class="section">
+            <div class="display-timer digits-box">
+              <span class="section-1 digits"> </span>
+              <span class="section-2 digits"> </span>
+              <span class="section-3 digits"> </span>
+            </div>
           </div>
         </div>
         <table id="minesweeper"></table>
       </div>
+    </div>
+    <div class="score-board-container">
+      <ul class="score-board hide">
+        <li class="score-list">하나</li>
+        <li class="score-list">둘</li>
+        <li class="score-list">셋</li>
+      </ul>
     </div>
   </div>
 </body>

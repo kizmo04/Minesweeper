@@ -85,77 +85,82 @@
         border-top: @borderWidth solid #808080;
         border-left: @borderWidth solid #808080;
 
-        .display-count-bomb-left {
-          float: left;
-        }
-        .display-status {
-          float: left;
-          // clear: both;
-          cursor: pointer;
-          background-color: #CCCCCC;
-          background-image: url("https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true");
-          background-repeat: no-repeat;
-          background-position: center;
-          border-left: @borderWidth solid white;
-          border-top: @borderWidth solid white;
-          border-bottom: @borderWidth solid #808080;
-          border-right: @borderWidth solid #808080;
-          border-radius: 2px;
-          width: 50px;
-          height: 50px;
-          background-size: 45px 45px;
-          margin: 16px auto;
-        }
-
-        .display-status:active {
-          border-left: @borderWidth solid #808080;
-          border-top: @borderWidth solid #808080;
-          border-bottom: @borderWidth solid white;
-          border-right: @borderWidth solid white;
-          background-position: 4px 4px;
-        }
-
-        .dead {
-          background-image: url("https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true");
-        }
-
-        .display-timer {
-          float: right;
-          // border: 1px solid black;
-          // float: right;
-          // background-color: black;
-          // overflow: hidden;
-          // width: 90px;
-          // height: 60px;
-          // text-align: center;
-
-          .section-1 {
-
-          }
-          .section-2 {
-
-          }
-          .section-3 {
-
-          }
-        }
-        .digits-box {
-          margin: 15px 15px;
-          background-image: url('https://minesweeper.online/img/skins/hd/nums_background.svg');
-          background-size: 100% 100%;
+        .section {
+          width: 33%;
           overflow: hidden;
-          width: 90px;
-          height: 60px;
+          float: left;
 
-          .digits {
-            float: left;
-            background-size: 100% 100%;
-            background-position: center;
+          .display-count-bomb-left {
+            // float: left;
+            margin: 16px auto;
+          }
+
+          .display-status {
+            // float: left;
+            // clear: both;
+            cursor: pointer;
+            background-color: #CCCCCC;
+            background-image: url("https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true");
             background-repeat: no-repeat;
-            width: 24px;
-            height: 54px;
-            display: block;
-            margin: 3px;
+            background-position: center;
+            border-left: @borderWidth solid white;
+            border-top: @borderWidth solid white;
+            border-bottom: @borderWidth solid #808080;
+            border-right: @borderWidth solid #808080;
+            border-radius: 2px;
+            width: 50px;
+            height: 50px;
+            background-size: 45px 45px;
+            margin: 16px auto;
+          }
+
+          .display-status:active {
+            border-left: @borderWidth solid #808080;
+            border-top: @borderWidth solid #808080;
+            border-bottom: @borderWidth solid white;
+            border-right: @borderWidth solid white;
+            background-position: 4px 4px;
+          }
+
+          .dead {
+            background-image: url("https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true");
+          }
+
+          .display-timer {
+            margin: 16px auto;
+            // float: right;
+            // border: 1px solid black;
+            // float: right;
+            // background-color: black;
+            // overflow: hidden;
+            // width: 90px;
+            // height: 60px;
+            // text-align: center;
+            .section-1 {
+            }
+            .section-2 {
+            }
+            .section-3 {
+            }
+          }
+          .digits-box {
+            margin: 15px auto;
+            background-image: url('https://minesweeper.online/img/skins/hd/nums_background.svg');
+            background-size: 100% 100%;
+            overflow: hidden;
+            width: 90px;
+            height: 60px;
+
+            .digits {
+              float: left;
+              background-size: 100% 100%;
+              background-position: center;
+              background-repeat: no-repeat;
+              width: 24px;
+              height: 54px;
+              display: block;
+              margin: 3px;
+            }
           }
         }
       }
@@ -201,16 +206,22 @@
         }
 
         td.flagged::after {
-          background-image: url('https://github.com/pardahlman/minesweeper/blob/master/Images/flagged.png?raw=true');
+          background-image: url('https://minesweeper.online/img/skins/hd/flag.svg');
           background-size: @cellSize @cellSize;
           background-position: center;
           pointer-events: none;
         }
 
         td.pushed::after {
-          border-color: #C1C1C1;
-          background-color: #C1C1C1;
-          // background-size: @cellSize @cellSize;
+          background-image: url('https://minesweeper.online/img/skins/hd/type0.svg');
+          width: @cellSize;
+          height: @cellSize;
+
+          // border-color: #C1C1C1;
+          border: none;
+          // background-position: center;
+          // background-color: #C1C1C1;
+          background-size: @cellSize @cellSize;
           // top: 0;
           // left: 0;
         }
@@ -221,4 +232,20 @@
 
 .hide {
   display: none;
+}
+
+.score-board-container {
+  position: absolute;
+  top: 170px;
+  width: 50%;
+
+  .score-board {
+    background-color: black;
+
+    .score-list {
+      font-size: 2em;
+      color: red;
+      font-family: @fontFamily;
+    }
+  }
 }

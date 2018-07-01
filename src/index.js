@@ -8,24 +8,34 @@
   var nonBombCellList = [];
   var surroundElementsList = [];
   var timerID;
+  var difficulty;
+  var userName;
   var isFirst = true;
+  var scoreStorage;
   var smileIcon = document.querySelector('.display-status');
   var btnContainer = document.querySelector('.btn-container');
   var displayBombLeft = document.querySelector('.display-count-bomb-left');
   var mineMapTable = document.querySelector('#minesweeper');
   var timerDisplay = document.querySelector('.display-timer');
+  var scoreBoard = document.querySelector('.score-board');
+  var scoreContainer = document.querySelector('.score-container');
+  var gameContainer = document.querySelector('.game-container');
   var sourceImgUrl = {
-    0: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/0.png?raw=true')",
-    1: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/1.png?raw=true')",
-    2: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/2.png?raw=true')",
-    3: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/3.png?raw=true')",
-    4: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/4.png?raw=true')",
-    5: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/5.png?raw=true')",
-    6: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/6.png?raw=true')",
-    7: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/7.png?raw=true')",
-    8: "url('https://github.com/pardahlman/minesweeper/blob/master/Images/8.png?raw=true')",
-    '*': "url('https://github.com/pardahlman/minesweeper/blob/master/Images/bomb.png?raw=true')",
-    'dead': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true')"
+    0: "url('https://minesweeper.online/img/skins/hd/type0.svg')",
+    1: "url('https://minesweeper.online/img/skins/hd/type1.svg')",
+    2: "url('https://minesweeper.online/img/skins/hd/type2.svg')",
+    3: "url('https://minesweeper.online/img/skins/hd/type3.svg')",
+    4: "url('https://minesweeper.online/img/skins/hd/type4.svg')",
+    5: "url('https://minesweeper.online/img/skins/hd/type5.svg')",
+    6: "url('https://minesweeper.online/img/skins/hd/type6.svg')",
+    7: "url('https://minesweeper.online/img/skins/hd/type7.svg')",
+    8: "url('https://minesweeper.online/img/skins/hd/type8.svg')",
+    '*': "url('https://minesweeper.online/img/skins/hd/mine.svg')",
+    '*red': "url('https://minesweeper.online/img/skins/hd/mine_red.svg')",
+    'dead': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/sad-emoji.png?raw=true')",
+    'victory': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/victory-emoji.png?raw=true')",
+    'hmm': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/hmm-emoji.png?raw=true')",
+    'wink': "url('https://github.com/kizmo04/Minesweeper/blob/master/img/wink-emoji.png?raw=true')"
   };
   var digitImgUrl = {
     0: "url('https://minesweeper.online/img/skins/hd/d0.svg')",
@@ -97,8 +107,11 @@
   }
 
   function loadTemplate() {
+    scoreStorage = window.localStorage.getItem("minesweeper");
+    if (scoreStorage) scoreStorage = [];
     nonBombCellCount = Math.pow(size, 2) - quantity;
-    smileIcon.classList.remove('dead');
+    // smileIcon.classList.remove('dead');
+    smileIcon.style.backgroundImage = sourceImgUrl.wink;
     countBombLeftQuantity = quantity;
     countBombLeft(countBombLeftQuantity);
     if (timerID) clearInterval(timerID);
@@ -115,6 +128,7 @@
         mapCell.classList.add('map-cell');
         mapCell.classList.add('blind');
         mapCell.dataset.value = mineMap[i][j];
+        mapCell.dataset.flagged = false;
         mapCell.style.backgroundImage = sourceImgUrl[mineMap[i][j]];
         mapCell.dataset.index = i * size + j;
         mapRow.appendChild(mapCell);
@@ -156,21 +170,22 @@
 
   mineMapTable.addEventListener('mousedown', function(e) {
     if (e.target && e.target.className.includes('blind')) {
+      smileIcon.style.backgroundImage = sourceImgUrl.hmm;
       if (e.buttons === 2) {
-        e.target.classList.toggle('flagged');
-        if (e.target.dataset.flagged) {
-          e.target.dataset.flagged = false;
-          countBombLeft(++countBombLeftQuantity);
-        } else {
+        if (e.target.dataset.flagged === 'false') {
+          e.target.classList.add('flagged');
           e.target.dataset.flagged = true;
           countBombLeft(--countBombLeftQuantity);
+        } else {
+          e.target.classList.remove('flagged');
+          countBombLeft(++countBombLeftQuantity);
         }
-      } else if (e.buttons === 0) {
+      } else if (e.buttons === 1) {
         if (prevCell) {
           prevCell.classList.remove('pushed');
         }
-        prevCell = e.target;
         e.target.classList.add('pushed');
+        prevCell = e.target;
       }
     } else if (e.target.dataset.value !== '0'){
       surroundElementsList = findSurroundElements(parseInt(e.target.dataset.index));
@@ -202,35 +217,56 @@
   }
 
   mineMapTable.addEventListener('mouseup', function(e) {
+    if (e.target.className.includes('blind')) smileIcon.style.backgroundImage = sourceImgUrl.wink;
     if (surroundElementsList.length > 0) {
       surroundElementsList.forEach(function(element) {
         if (element) element.classList.remove('pushed');
       });
     }
 
-    if (e.target && e.target.tagName === 'TD' && !e.target.dataset.flagged) {
-      if (e.buttons === 0) {
-        if (isFirst) {
-          timerID = startTimer();
-          isFirst = false;
-        }
-        e.target.classList.remove('pushed');
+    if (e.target && e.target.className.includes('blind') && e.target.dataset.flagged === 'false') {
+      if (isFirst) {
+        timerID = startTimer();
+        isFirst = false;
+      }
+      e.target.classList.remove('pushed');
+      prevCell = null;
+      if (e.target.dataset.value === '*') {
+        blindCellList.forEach(function(item) {
+          item.classList.remove('blind');
+        });
+        // smileIcon.classList.add('dead');
+        smileIcon.style.backgroundImage = sourceImgUrl.dead;
+        e.target.style.backgroundImage = sourceImgUrl['*red'];
+        clearInterval(timerID);
+      } else if (e.target.className.includes('blind')) {
+        nonBombCellCount--;
         e.target.classList.remove('blind');
-        prevCell = null;
-        if (e.target.dataset.value === '*') {
-          blindCellList.forEach(function(item) {
-            item.classList.remove('blind');
+        if (e.target.dataset.value === '0') {
+          console.log('zero!')
+          var zeroCellList = findZeroCells(e.target);
+          zeroCellList.forEach(function(cell) {
+            cell.classList.remove('blind');
           });
-          smileIcon.classList.add('dead');
-        } else {
-          e.target.classList.remove('blind');
-          // nonBombCellList.pop();
-          nonBombCellCount--;
-          if (nonBombCellCount === 0) {
-            alert('끝!');
-          }
+        }
+        if (nonBombCellCount === 0) {
+          clearInterval(timerID);
+          smileIcon.style.backgroundImage = sourceImgUrl.victory;
+          // 남은 폭탄들에 모두 자동으로 깃발 꽃아주기 (클릭 못하도록)
+          // 폭탄 아닌것들 다 열었는지 확인하는 조건 다른방법으로..
+          userName = prompt('승리했습니다! 이름을 입력해주세요', 'user name');
+          var gameData = {};
+          gameData.date = new Date().toLocaleDateString();
+          gameData.username = userName;
+          gameData.difficulty = difficulty;
+          gameData.score = timerDisplay.dataset.time;
+          scoreStorage.push(gameData);
+          scoreBoard.classList.remove('hide');
+          window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
       }
+    } else if (e.target.dataset.flagged !== 'false' && !e.target.className.includes('flagged')) {
+      e.target.flagged = false;
     }
   });
 
@@ -258,6 +294,7 @@
       difficultyMenus.classList.remove('hide');
       mainMenus.classList.add('hide');
     } else if (e.target && e.target.className.includes('score')) {
+      scoreBoard.classList.remove('hide');
 
     } else if (e.target && e.target.className.includes('close')) {
       difficultyMenus.classList.add('hide');
@@ -268,6 +305,9 @@
 
       size = 10;
       quantity = 10;
+      difficuty = "beginner";
+      gameContainer.style.width = (30 * size + 60) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('amateur')) {
       difficultyMenus.classList.add('hide');
@@ -275,6 +315,9 @@
 
       size = 15;
       quantity = 40;
+      difficuty = "amateur";
+      gameContainer.style.width = (30 * size + 60) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     } else if (e.target.className.includes('expert')) {
       difficultyMenus.classList.add('hide');
@@ -282,6 +325,9 @@
 
       size = 20;
       quantity = 100;
+      difficuty = "expert";
+      gameContainer.style.width = (30 * size + 60) + 'px';
+      scoreContainer.style.width = (30 * size) + 'px';
       startGame();
     }
   });
@@ -297,9 +343,41 @@
       timerDisplay.querySelector('.section-1').style.backgroundImage = digitImgUrl[timeDigitsToString.charAt(0)];
       timerDisplay.querySelector('.section-2').style.backgroundImage = digitImgUrl[timeDigitsToString.charAt(1)];
       timerDisplay.querySelector('.section-3').style.backgroundImage = digitImgUrl[timeDigitsToString.charAt(2)];
+      timerDisplay.dataset.time = timeDigitsToString;
       timeDigits++;
     }
     return setInterval(changeDigits, 1000);
+  }
+var count = 0;
+var cellsToOpen = [];
+var memo = [];
+  function findZeroCells(cell) {
+
+    if (cell.dataset.value !== '0' && cell.dataset.value !== '*') {
+      cellsToOpen.push(cell);
+      return cellsToOpen;
+    }
+
+    if (!memo.includes(cell)) {
+      memo.push(cell);
+      if (cell.dataset.value !== '*') cellsToOpen.push(cell);
+    }
+    var leftIndex = parseInt(cell.dataset.index) - 1;
+    var rightIndex = parseInt(cell.dataset.index) + 1;
+    var prevRowIndex = parseInt(cell.dataset.index) - size;
+    var nextRowIndex = parseInt(cell.dataset.index) + size;
+
+    var leftCell = document.querySelector('td[data-index="' + leftIndex + '"]');
+    var rightCell = document.querySelector('td[data-index="' + rightIndex + '"]');
+    var upCell = document.querySelector('td[data-index="' + prevRowIndex + '"]');
+    var downCell = document.querySelector('td[data-index="' + nextRowIndex + '"]');
+    console.log(memo, count++)
+    if (leftCell && !memo.includes(leftCell) && (parseInt(cell.dataset.index) % size) !== 0) cellsToOpen.concat(findZeroCells(leftCell));
+    if (rightCell && !memo.includes(rightCell) && (parseInt(cell.dataset.index) % size) !== (size - 1)) cellsToOpen.concat(findZeroCells(rightCell));
+    if (upCell && !memo.includes(upCell)) cellsToOpen.concat(findZeroCells(upCell));
+    if (downCell && !memo.includes(downCell)) cellsToOpen.concat(findZeroCells(downCell));
+
+    return cellsToOpen;
   }
 
 
