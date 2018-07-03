@@ -576,6 +576,22 @@ module.exports = __webpack_require__(7);
     '-': "url('https://minesweeper.online/img/skins/hd/d-.svg')"
   };
 
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAfD4FaWZyBRc8UgPL5P47wL4mOhLNu2yM",
+    authDomain: "minesweeper-edd23.firebaseapp.com",
+    databaseURL: "https://minesweeper-edd23.firebaseio.com",
+    projectId: "minesweeper-edd23",
+    storageBucket: "",
+    messagingSenderId: "537666346206"
+  };
+  firebase.initializeApp(config);
+
+  var database = firebase.database();
+
+  var gameDataRef;
+  gameDataRef = database.ref('games');
+
   function createMap() {
     var mapRow = new Array(size);
     for (var i = 0; i < size; i++) {
@@ -631,9 +647,13 @@ module.exports = __webpack_require__(7);
     return map;
   }
 
+  gameDataRef.once('value').then(function(score) {
+    scoreStorage = JSON.parse(score.val());
+  });
+
   function loadTemplate() {
-    scoreStorage = JSON.parse(window.localStorage.getItem("minesweeper"));
-    if (!scoreStorage) scoreStorage = [];
+    // scoreStorage = JSON.parse(window.localStorage.getItem("minesweeper"));
+    // if (!scoreStorage) scoreStorage = [];
     smileIcon.style.backgroundImage = sourceImgUrl.wink;
     countBombLeftQuantity = quantity;
     countBombLeft(countBombLeftQuantity);
@@ -726,8 +746,9 @@ module.exports = __webpack_require__(7);
           gameData.score = timerDisplay.dataset.time;
           scoreStorage.push(gameData);
           displayScoreBoard(scoreStorage);
+          gameDataRef.set(JSON.stringify(scoreStorage));
           scoreBoardContainer.classList.remove('hide');
-          window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
+          // window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
       }
 
@@ -827,9 +848,10 @@ module.exports = __webpack_require__(7);
           gameData.difficulty = difficulty;
           gameData.score = timerDisplay.dataset.time;
           scoreStorage.push(gameData);
+          gameDataRef.set(JSON.stringify(scoreStorage));
           displayScoreBoard(scoreStorage);
           scoreBoardContainer.classList.remove('hide');
-          window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
+          // window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
       }
     }
@@ -952,6 +974,11 @@ module.exports = __webpack_require__(7);
   }
 
   function displayScoreBoard(scoreStorageData) {
+    if (scoreBoard.hasChildNodes()) {
+      while (scoreBoard.hasChildNodes()) {
+        scoreBoard.firstChild.remove();
+      }
+    }
     scoreStorageData.forEach(function(item) {
       var record = scoreBoard.insertRow();
       record.classList.add('score-list');
