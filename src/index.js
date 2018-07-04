@@ -131,9 +131,9 @@
     return map;
   }
 
-  gameDataRef.once('value').then(function(score) {
-    console.log(score.games);
-  });
+  // gameDataRef.once('value').then(function(score) {
+  //   console.log(score.games);
+  // });
 
   function loadTemplate() {
     // scoreStorage = JSON.parse(window.localStorage.getItem("minesweeper"));
@@ -478,7 +478,6 @@
   firebase.database().ref('games').orderByChild('score').limitToFirst(10).on('value', function(snapshot) {
     var sortedScoreData = snapshot.val();
     var sortedScoreDataKeys = Object.keys(snapshot.val());
-    console.log(sortedScoreDataKeys);
     var recordRows = document.querySelectorAll('.score-list:not(:first-child)');
 
     for (var i = 0; i < sortedScoreDataKeys.length; i++) {
