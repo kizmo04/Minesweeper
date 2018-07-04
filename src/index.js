@@ -1,3 +1,4 @@
+const keys = require('./credentials.js');
 
 (function() {
   var size = 10;
@@ -60,12 +61,12 @@
   // Initialize Firebase
   var firebase = require("firebase");
   var config = {
-    apiKey: "AIzaSyAfD4FaWZyBRc8UgPL5P47wL4mOhLNu2yM",
-    authDomain: "minesweeper-edd23.firebaseapp.com",
-    databaseURL: "https://minesweeper-edd23.firebaseio.com",
-    projectId: "minesweeper-edd23",
-    storageBucket: "",
-    messagingSenderId: "537666346206"
+    apiKey: keys.apiKey,
+    authDomain: keys.authDomain,
+    databaseURL: keys.databaseURL,
+    projectId: keys.projectId,
+    storageBucket: keys.storageBucket,
+    messagingSenderId: keys.messagingSenderId
   };
   firebase.initializeApp(config);
 
