@@ -58,6 +58,7 @@
   };
 
   // Initialize Firebase
+  var firebase = require("firebase");
   var config = {
     apiKey: "AIzaSyAfD4FaWZyBRc8UgPL5P47wL4mOhLNu2yM",
     authDomain: "minesweeper-edd23.firebaseapp.com",
@@ -477,6 +478,7 @@
   firebase.database().ref('games').orderByChild('score').limitToFirst(10).on('value', function(snapshot) {
     var sortedScoreData = snapshot.val();
     var sortedScoreDataKeys = Object.keys(snapshot.val());
+    console.log(sortedScoreDataKeys);
     var recordRows = document.querySelectorAll('.score-list:not(:first-child)');
 
     for (var i = 0; i < sortedScoreDataKeys.length; i++) {
