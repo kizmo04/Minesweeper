@@ -592,6 +592,8 @@ module.exports = __webpack_require__(7);
   var gameDataRef;
   gameDataRef = database.ref('games');
 
+  var gameDataKeys;
+
   function createMap() {
     var mapRow = new Array(size);
     for (var i = 0; i < size; i++) {
@@ -648,12 +650,11 @@ module.exports = __webpack_require__(7);
   }
 
   gameDataRef.once('value').then(function(score) {
-    scoreStorage = JSON.parse(score.val());
+    console.log(score.games);
   });
 
   function loadTemplate() {
     // scoreStorage = JSON.parse(window.localStorage.getItem("minesweeper"));
-    // if (!scoreStorage) scoreStorage = [];
     smileIcon.style.backgroundImage = sourceImgUrl.wink;
     countBombLeftQuantity = quantity;
     countBombLeft(countBombLeftQuantity);
@@ -677,6 +678,19 @@ module.exports = __webpack_require__(7);
       }
     }
     blindCellList = document.querySelectorAll('.blind');
+
+    for (var i = 0; i < 10; i++) {
+      var record = scoreBoard.insertRow();
+      record.classList.add('score-list');
+      var dateCell = record.insertCell();
+      dateCell.classList.add('td-date');
+      var usernameCell = record.insertCell();
+      usernameCell.classList.add('td-username');
+      var difficultyCell = record.insertCell();
+      difficultyCell.classList.add('td-difficulty');
+      var scoreCell = record.insertCell();
+      scoreCell.classList.add('td-score');
+    }
   }
 
 
@@ -744,9 +758,11 @@ module.exports = __webpack_require__(7);
           gameData.username = userName;
           gameData.difficulty = difficulty;
           gameData.score = timerDisplay.dataset.time;
-          scoreStorage.push(gameData);
-          displayScoreBoard(scoreStorage);
-          gameDataRef.set(JSON.stringify(scoreStorage));
+          // scoreStorage.push(gameData);
+          // gameDataRef.set(scoreStorage);
+          var newGameData = gameDataRef.push();
+          newGameData.set(gameData);
+          // displayScoreBoard();
           scoreBoardContainer.classList.remove('hide');
           // window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
@@ -847,9 +863,14 @@ module.exports = __webpack_require__(7);
           gameData.username = userName;
           gameData.difficulty = difficulty;
           gameData.score = timerDisplay.dataset.time;
-          scoreStorage.push(gameData);
-          gameDataRef.set(JSON.stringify(scoreStorage));
-          displayScoreBoard(scoreStorage);
+          // scoreStorage.push(gameData);
+          // gameDataRef.set(scoreStorage);
+          var newGameData = gameDataRef.push();
+          newGameData.set(gameData);
+          // displayScoreBoard();
+          // gameDataRef.on('child_added', function(score) {
+          //   displayScoreBoard(score.val());
+          // });
           scoreBoardContainer.classList.remove('hide');
           // window.localStorage.setItem("minesweeper", JSON.stringify(scoreStorage));
         }
@@ -882,7 +903,6 @@ module.exports = __webpack_require__(7);
   });
 
   btnContainer.addEventListener('click', function(e) {
-    console.log(typeof e.target.className)
     e.preventDefault();
     if (e.target && e.target.className.includes('difficulty')) {
       difficultyMenus.classList.remove('hide');
@@ -890,7 +910,7 @@ module.exports = __webpack_require__(7);
     } else if (e.target && e.target.className.includes('score')) {
       scoreBoardContainer.classList.remove('hide');
       mainMenus.classList.add('hide');
-      displayScoreBoard(scoreStorage);
+      // displayScoreBoard(scoreStorage);
     } else if (e.target && e.target.className.includes('close')) {
       difficultyMenus.classList.add('hide');
       mainMenus.classList.remove('hide');
@@ -973,29 +993,31 @@ module.exports = __webpack_require__(7);
     return cellsToOpen;
   }
 
-  function displayScoreBoard(scoreStorageData) {
-    if (scoreBoard.hasChildNodes()) {
-      while (scoreBoard.hasChildNodes()) {
-        scoreBoard.firstChild.remove();
-      }
+  firebase.database().ref('games').orderByChild('score').limitToFirst(10).on('value', function(snapshot) {
+    var sortedScoreData = snapshot.val();
+    var sortedScoreDataKeys = Object.keys(snapshot.val());
+    var recordRows = document.querySelectorAll('.score-list:not(:first-child)');
+
+    for (var i = 0; i < sortedScoreDataKeys.length; i++) {
+      var dateCell = recordRows[i].cells[0];
+      dateCell.textContent = sortedScoreData[sortedScoreDataKeys[sortedScoreDataKeys.length - 1 - i]].date;
+      var usernameCell = recordRows[i].cells[1];
+      usernameCell.textContent = sortedScoreData[sortedScoreDataKeys[sortedScoreDataKeys.length - 1- i]].username;
+      var difficultyCell = recordRows[i].cells[2];
+      difficultyCell.textContent = sortedScoreData[sortedScoreDataKeys[sortedScoreDataKeys.length - 1 - i]].difficulty;
+      var scoreCell = recordRows[i].cells[3];
+      scoreCell.textContent = sortedScoreData[sortedScoreDataKeys[sortedScoreDataKeys.length - 1 - i]].score;
     }
-    scoreStorageData.forEach(function(item) {
-      var record = scoreBoard.insertRow();
-      record.classList.add('score-list');
-      var dateCell = record.insertCell();
-      dateCell.textContent = item.date;
-      dateCell.classList.add('td-date');
-      var usernameCell = record.insertCell();
-      usernameCell.textContent = item.username;
-      usernameCell.classList.add('td-username');
-      var difficultyCell = record.insertCell();
-      difficultyCell.textContent = item.difficulty;
-      difficultyCell.classList.add('td-difficulty');
-      var scoreCell = record.insertCell();
-      scoreCell.textContent = item.score;
-      scoreCell.classList.add('td-score');
-    });
-  }
+  });
+
+  // function displayScoreBoard() {
+  //   // if (scoreBoard.hasChildNodes()) {
+  //   //   while (scoreBoard.children.length > 1) {
+  //   //     scoreBoard.lastChild.remove();
+  //   //   }
+  //   // }
+
+  // }
 
   var bombList = makeBomb();
   var map = createMap();
